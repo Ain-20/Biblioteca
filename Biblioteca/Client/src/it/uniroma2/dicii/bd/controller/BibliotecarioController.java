@@ -96,148 +96,115 @@ public class BibliotecarioController  implements Controller{
                 "il mezzo di contatto preferito a scelta tra:\n1)Cellulare\n2)Telefono di casa\n3)Email\n","il valore del contatto specificato\n"};
         String[] valori = new String[parametri.length];
         Utente u=null;
-        int arg=0;
-        boolean flag=false;
-        String temp="";
+        int arg = 0;
+        boolean flag = false;
+        String temp = "";
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        while(arg<7){
-            flag=false;
-            System.out.printf("Inserisci %s:",parametri[arg]);
+
+        while(arg < parametri.length){
+            flag = false;
+            System.out.printf("Inserisci %s:", parametri[arg]);
             try {
                 temp = reader.readLine();
             } catch (IOException e) {
                 throw new RuntimeException("Errore di lettura input", e);
             }
 
-            //Uscita nel caso si volesse interrompere l'operazione
-            if(temp.equals("Exit")){return;}
+            if(temp.equals("Exit")){ return; }
 
-                switch(arg){
-                    case 0:
-                        if(temp.length()!=16){
-                            System.out.println("Valore non valido, riprovare! Il codice fiscale deve avere 16 caratteri\n");
-                            arg--;
-                            flag=true;
-                        }
-                        break;
-                    case 1, 2:
-                        if(temp.length()>30){
-                            System.out.println("Valore non valido, riprovare!Inserire meno di 30 caratteri\n");
-                            arg--;
-                            flag=true;
-                        }
-                        break;
-                    case 3:
-                        if(!(temp.equals("1") || temp.equals("2") || temp.equals("3") || temp.equals("4"))){
-                            System.out.println("Valore non valido, riprovare!\nInserire una tra le opzioni proposte\n");
-                            arg--;
-                            flag=true;
-                        }else{
-                            if(temp.equals("1")){
-                                valori[arg] = "Uomo";
-                            }else if(temp.equals("2")){
-                                valori[arg] = "Donna";
-                            }else if(temp.equals("3")){
-                                valori[arg] = "Non binario";
-                            }else{
-                                valori[arg] = "Preferisco non specificare";
-                            }
-                        }
-                        break;
-                    case 4:
-                        if (temp.length() != 10 || temp.trim().isEmpty()) {
+            switch(arg){
+                case 0:
+                    if(temp.length() != 16){
+                        System.out.println("Valore non valido, riprovare! Il codice fiscale deve avere 16 caratteri\n");
+                        arg--;
+                        flag = true;
+                    }
+                    break;
+                case 1, 2:
+                    if(temp.length() > 30){
+                        System.out.println("Valore non valido, riprovare! Inserire meno di 30 caratteri\n");
+                        arg--;
+                        flag = true;
+                    }
+                    break;
+                case 3:
+                    if(!(temp.equals("1") || temp.equals("2") || temp.equals("3") || temp.equals("4"))){
+                        System.out.println("Valore non valido, riprovare!\nInserire una tra le opzioni proposte\n");
+                        arg--;
+                        flag = true;
+                    } else {
+                        if(temp.equals("1")) valori[arg] = "Uomo";
+                        else if(temp.equals("2")) valori[arg] = "Donna";
+                        else if(temp.equals("3")) valori[arg] = "Non binario";
+                        else valori[arg] = "Preferisco non specificare";
+
+                        // CORREZIONE 2: Impostiamo flag a true per evitare che venga sovrascritto a fine ciclo
+                        flag = true;
+                    }
+                    break;
+                case 4:
+                    if (temp.length() != 10 || temp.trim().isEmpty()) {
+                        System.out.println("Valore non valido, riprovare!\nInserire la data nel formato YYYY-MM-DD\n");
+                        arg--;
+                        flag = true;
+                    } else {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
+                        try {
+                            LocalDate.parse(temp, formatter);
+                        } catch (DateTimeParseException e) {
                             System.out.println("Valore non valido, riprovare!\nInserire la data nel formato YYYY-MM-DD\n");
                             arg--;
-                            flag=true;
-                        }else{
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
-
-                            try {
-                                // Se il parsing va a buon fine, la data e il formato sono esatti
-                                LocalDate.parse(temp, formatter);
-                            } catch (DateTimeParseException e) {
-                                System.out.println("Valore non valido, riprovare!\nInserire la data nel formato YYYY-MM-DD\n");
-                                arg--;
-                                flag=true;
-                            }
+                            flag = true;
                         }
-                        break;
-                    case 5, 6:
-                        if (temp.length() > 40) {
-                            System.out.println("Valore non valido, riprovare!\nInserire meno di 40 caratteri\n");
-                            arg--;
-                            flag=true;
-                        }
-                        break;
-                }
-                if(!flag){
-                    valori[arg] = temp;
-                }
-            arg++;
-        }
+                    }
+                    break;
+                case 5, 6:
+                    if (temp.length() > 40) {
+                        System.out.println("Valore non valido, riprovare!\nInserire meno di 40 caratteri\n");
+                        arg--;
+                        flag = true;
+                    }
+                    break;
+                case 7:
+                    if(!(temp.equals("1") || temp.equals("2") || temp.equals("3"))){
+                        System.out.println("Valore non valido, riprovare!\nInserire una tra le opzioni proposte\n");
+                        arg--;
+                        flag = true;
+                    } else {
+                        if(temp.equals("1")) valori[arg] = "Cellulare";
+                        else if(temp.equals("2")) valori[arg] = "Telefono di casa";
+                        else valori[arg] = "Email";
 
-        //Inserimento contatto
-        arg=0;
-        while(arg<1) {
-            flag = false;
-            System.out.printf("Inserisci %s:", parametri[arg + 7]);
-            try {
-                temp = reader.readLine();
-            } catch (IOException e) {
-                throw new RuntimeException("Errore di lettura input", e);
+                        flag = true;
+                    }
+                    break;
+                case 8:
+                    // Validazione del VALORE del contatto basato sulla scelta precedente (che si trova in valori[7])
+                    String tipoScelto = valori[7];
+
+                    if (tipoScelto.equals("Cellulare") && temp.length() != 10) {
+                        System.out.println("Numero di cellulare non valido, riprovare!\n");
+                        arg--;
+                        flag = true;
+                    } else if (tipoScelto.equals("Telefono di casa") && temp.length() != 10) {
+                        System.out.println("Telefono di casa non valido, riprovare!\n");
+                        arg--;
+                        flag = true;
+                    } else if (tipoScelto.equals("Email") &&
+                            !(temp.toUpperCase().contains("@GMAIL.COM") ||
+                                    temp.toUpperCase().contains("@LIBERO.IT") ||
+                                    temp.toUpperCase().contains("@OUTLOOK.IT") ||
+                                    temp.toUpperCase().contains("@ICLOUD.COM") ||
+                                    temp.toUpperCase().contains("@HOTMAIL.COM"))) {
+                        System.out.println("Email inserita non valida, riprovare!\n");
+                        arg--;
+                        flag = true;
+                    }
+                    break;
             }
 
-            if (temp.equals("Exit")) {
-                return;
-            }
-
-            if (!(temp.equals("1") || temp.equals("2") || temp.equals("3"))){
-                System.out.println("Valore non valido, riprovare!\nInserire una delle opzioni consigliate\n");
-                arg--;
-                flag=true;
-            }else{
-
-                if(temp.equals("1")){
-                    valori[arg+7] = "Cellulare";
-                }else if(temp.equals("2")){
-                    valori[arg+7] = "Telefono di casa";
-                }else{
-                    valori[arg+7] = "Email";
-                }
-
-                System.out.printf("Inserisci il valore corrispondente:");
-                try {
-                    temp = reader.readLine();
-                } catch (IOException e) {
-                    throw new RuntimeException("Errore di lettura input", e);
-                }
-
-                if(valori[arg+7].equals("Cellulare") && temp.length()!=10){
-                    System.out.println("Numero di cellulare non valido, riprovare!\n");
-                    arg--;
-                    flag=true;
-                }else if(valori[arg+7].equals("Telefono di casa") && temp.length()!=10){
-                    System.out.println("Telefono di casa non valido, riprovare!\n");
-                    arg--;
-                    flag=true;
-                }else if((valori[arg+7].equals("Email") &&
-                        !(temp.toUpperCase().contains("@GMAIL.COM")
-                        || temp.toUpperCase().contains("@LIBERO.IT")
-                        || temp.toUpperCase().contains("@OUTLOOK.IT")
-                                || temp.toUpperCase().contains("@ICLOUD.COM")
-                                || temp.toUpperCase().contains("@HOTMAIL.COM")))){
-                    System.out.println("Email inserita non valida, riprovare!\n");
-                    arg--;
-                    flag=true;
-                }
-
-                if(temp.equals("") || temp.length()==0){
-                    System.out.println("Valore non valido, riprovare!\n");
-                    arg--;
-                    flag=true;
-                }else{
-                    valori[arg+8] = temp;
-                }
+            if(!flag){
+                valori[arg] = temp;
             }
             arg++;
         }

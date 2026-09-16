@@ -41,7 +41,6 @@ public class ResponsabileController implements Controller{
                 case 3 -> reportCopieTrasferite();
                 case 4 -> System.exit(0);
                 default -> throw new RuntimeException("Opzione invalida");
-                //migliorare report copie in prestito aggiungendo anche identificativo dell'utente e contatto
             }
         }
     }

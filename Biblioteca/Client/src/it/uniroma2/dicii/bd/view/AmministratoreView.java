@@ -9,17 +9,6 @@ public class AmministratoreView {
         System.out.println("*    LIBRARY MENU    *");
         System.out.println("*********************************\n");
         System.out.println("*** Scegliere una delle seguenti opzioni ***\n");
-        /*System.out.println("1) Registrazione Utente");
-        System.out.println("2) Registrazione Prestito Utente");
-        System.out.println("3) Restituzione Copia Prestito Utente");
-        System.out.println("4) Report Copie in Prestito");
-        System.out.println("5) Inserimento Copia");
-        System.out.println("6) Inserimento Libro");
-        System.out.println("7) Trasferimento Copia");
-        System.out.println("8) Restituzione Copia Trasferita");
-        System.out.println("9) Stampa lista copie");
-        System.out.println("10) Stampa lista libri");
-        System.out.println("11) Stampa lista utenti");*/
         System.out.println("1) Dismissione libri");
         System.out.println("2) Esci");
 

@@ -28,23 +28,6 @@ public class CopieDAO implements GenericProcedureDAO<Copia> {
         return new Copia((String) params[0], (String) params[1], "Disponibile", (int) Integer.parseInt((String) params[2]), (int) Integer.parseInt((String) params[2]));
     }
 
-    public void listaCopie() throws DAOException {
-        try {
-            Connection conn = ConnectionFactory.getConnection();
-            CallableStatement cs = conn.prepareCall("{call listaCopie()}");
-            boolean status = cs.execute();
-
-            if (status) {
-                ResultSet rs = cs.getResultSet();
-                StampaResultSet.printResultsTable(rs,System.out);
-
-            }
-
-        } catch (SQLException e) {
-            throw new DAOException("Errore lista copie: " + e.getMessage());
-        }
-    }
-
     public void reportCopieNonRestituite() throws DAOException {
         try {
 

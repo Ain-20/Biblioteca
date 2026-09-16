@@ -301,7 +301,12 @@ BEGIN
     SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
     START TRANSACTION;
 
-    INSERT INTO `Copia`(`Etichetta`, `CodiceLibro`, `Stato`, `NumeroRipiano`, `NumeroScaffale`) VALUES (var_Etichetta,var_CodiceLibro,'Disponibile',var_NumeroRipiano,var_NumeroScaffale);
+    IF var_NumeroRipiano=0 AND var_NumeroScaffale=0 THEN
+        INSERT INTO `Copia`(`Etichetta`, `CodiceLibro`, `Stato`, `NumeroRipiano`, `NumeroScaffale`) VALUES (var_Etichetta,var_CodiceLibro,'Disponibile',NULL,NULL);
+    ELSE
+        INSERT INTO `Copia`(`Etichetta`, `CodiceLibro`, `Stato`, `NumeroRipiano`, `NumeroScaffale`) VALUES (var_Etichetta,var_CodiceLibro,'Disponibile',var_NumeroRipiano,var_NumeroScaffale);
+    END IF;
+
 
     COMMIT;
 
@@ -391,7 +396,7 @@ BEGIN
     END IF;
 
     -- controllo che la copia da trasferire esista e non sia stata dismessa
-    IF NOT EXISTS (SELECT 1 FROM `Copia`,`Libro` WHERE `Etichetta` = var_Copia AND `Copia`.`CodiceLibro` AND `Libro`.`Dismissione`=FALSE) THEN
+    IF NOT EXISTS (SELECT 1 FROM `Copia`,`Libro` WHERE `Etichetta` = var_Copia AND `Copia`.`CodiceLibro`=`Libro`.`ISBN` AND `Libro`.`Dismissione`=FALSE) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Errore: la copia non esiste.';
     END IF;
@@ -687,35 +692,6 @@ BEGIN
     UPDATE `Libro` SET `Dismissione` = TRUE WHERE `Dismissione` = FALSE AND `DataImmissione` <= DATE_SUB(CURDATE(), INTERVAL 10 YEAR) AND `ISBN` NOT IN (
           -- seleziono i libri che hanno avuto almeno un prestito negli ultimi 10 anni
           SELECT C.CodiceLibro FROM `PrestitoUtente` P, `Copia` C WHERE P.Copia = C.Etichetta AND P.DataPrestito >= DATE_SUB(CURDATE(), INTERVAL 10 YEAR));
-
-    COMMIT;
-
-END$$
-
-DELIMITER ;
-
--- -----------------------------------------------------
--- procedure listaCopie
--- -----------------------------------------------------
-
-USE `biblioteca`;
-DROP PROCEDURE IF EXISTS `listaCopie`;
-
-DELIMITER $$
-
-CREATE PROCEDURE `listaCopie` ()
-BEGIN
-
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        ROLLBACK;
-        RESIGNAL;
-    END;
-
-    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
-    START TRANSACTION;
-
-    SELECT * FROM `Copia`,`Libro` WHERE `Copia`.`CodiceLibro`=`Libro`.`ISBN` AND `Libro`.`Dismissione`=FALSE;
 
     COMMIT;
 
@@ -1124,7 +1100,6 @@ GRANT EXECUTE ON procedure `biblioteca`.`registraPrestitoUtente` TO 'bibliotecar
 GRANT EXECUTE ON procedure `biblioteca`.`restituzioneCopiaUtente` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`inserisciCopia` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`trasferimentoCopia` TO 'bibliotecario'@'localhost';
-GRANT EXECUTE ON procedure `biblioteca`.`listaCopie` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`listaUtenti` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`listaLibri` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`restituzioneCopiaTrasferita` TO 'bibliotecario'@'localhost';

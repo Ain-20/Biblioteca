@@ -15,7 +15,7 @@ public class UtenteDAO implements GenericProcedureDAO<Utente> {
         try {
             Connection conn = ConnectionFactory.getConnection();
             CallableStatement cs = conn.prepareCall("{call inserisciUtente(?,?,?,?,?,?,?,?,?)}");
-            cs.setString(1, (String) params[0]); //CF
+            cs.setString(1, ((String) params[0]).toUpperCase()); //CF
             cs.setString(2, (String) params[1]); //Nome
             cs.setString(3, (String) params[2]); //Cognome
             cs.setString(4, (String) params[3]); //Sesso

@@ -301,7 +301,12 @@ BEGIN
     SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
     START TRANSACTION;
 
-    INSERT INTO `Copia`(`Etichetta`, `CodiceLibro`, `Stato`, `NumeroRipiano`, `NumeroScaffale`) VALUES (var_Etichetta,var_CodiceLibro,'Disponibile',var_NumeroRipiano,var_NumeroScaffale);
+    IF var_NumeroRipiano=0 AND var_NumeroScaffale=0 THEN
+        INSERT INTO `Copia`(`Etichetta`, `CodiceLibro`, `Stato`, `NumeroRipiano`, `NumeroScaffale`) VALUES (var_Etichetta,var_CodiceLibro,'Disponibile',NULL,NULL);
+    ELSE
+        INSERT INTO `Copia`(`Etichetta`, `CodiceLibro`, `Stato`, `NumeroRipiano`, `NumeroScaffale`) VALUES (var_Etichetta,var_CodiceLibro,'Disponibile',var_NumeroRipiano,var_NumeroScaffale);
+    END IF;
+
 
     COMMIT;
 
@@ -695,35 +700,6 @@ END$$
 DELIMITER ;
 
 -- -----------------------------------------------------
--- procedure listaCopie
--- -----------------------------------------------------
-
-USE `biblioteca`;
-DROP PROCEDURE IF EXISTS `listaCopie`;
-
-DELIMITER $$
-
-CREATE PROCEDURE `listaCopie` ()
-BEGIN
-
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        ROLLBACK;
-        RESIGNAL;
-    END;
-
-    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
-    START TRANSACTION;
-
-    SELECT * FROM `Copia`,`Libro` WHERE `Copia`.`CodiceLibro`=`Libro`.`ISBN` AND `Libro`.`Dismissione`=FALSE;
-
-    COMMIT;
-
-END$$
-
-DELIMITER ;
-
--- -----------------------------------------------------
 -- procedure listaUtenti
 -- -----------------------------------------------------
 
@@ -1087,14 +1063,6 @@ END$$
 DELIMITER ;
 
 -- -----------------------------------------------------
--- Indexes
--- -----------------------------------------------------
-CREATE INDEX idx_prestiti_attivi ON PrestitoUtente(DataRestituzione);
-CREATE INDEX idx_copia_disponibile ON Copia(CodiceLibro, Stato);
-CREATE INDEX idx_libro_dismissione ON Libro(Dismissione, DataImmissione);
-CREATE INDEX idx_data_prestito ON PrestitoUtente(DataPrestito);
-
--- -----------------------------------------------------
 -- Users and privileges
 -- -----------------------------------------------------
 
@@ -1132,7 +1100,6 @@ GRANT EXECUTE ON procedure `biblioteca`.`registraPrestitoUtente` TO 'bibliotecar
 GRANT EXECUTE ON procedure `biblioteca`.`restituzioneCopiaUtente` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`inserisciCopia` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`trasferimentoCopia` TO 'bibliotecario'@'localhost';
-GRANT EXECUTE ON procedure `biblioteca`.`listaCopie` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`listaUtenti` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`listaLibri` TO 'bibliotecario'@'localhost';
 GRANT EXECUTE ON procedure `biblioteca`.`restituzioneCopiaTrasferita` TO 'bibliotecario'@'localhost';
